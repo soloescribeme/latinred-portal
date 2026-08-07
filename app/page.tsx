@@ -7,7 +7,7 @@ export default function Home() {
       id: 'qrifas',
       nombre: 'Qrifas',
       subdominio: 'qrifas.latinred.app',
-      url: 'https://qrifas.latinred.app',
+      url: 'https://qrifas.com',
       descripcion: 'App para organizar y gestionar rifas y sorteos certificados con tómbola digital en vivo.',
       imagen: '/qrifas-logo.png',
       badge: '🔴 Tómbola En Vivo',
@@ -69,9 +69,11 @@ export default function Home() {
       <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-tr from-rose-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-950/50 ring-1 ring-rose-400/30">
-              <span className="font-black text-xl text-white tracking-tighter">LR</span>
-            </div>
+            <img 
+              src="/logo latinred.png" 
+              alt="LatinRed Logo" 
+              className="h-12 w-auto object-contain rounded-xl"
+            />
             <div>
               <span className="font-black text-xl tracking-tight text-white block leading-none">
                 LatinRed <span className="text-rose-500 font-extrabold">.app</span>
@@ -176,6 +178,8 @@ export default function Home() {
 
                   <a
                     href={app.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-full bg-gradient-to-r ${app.btnColor} text-white font-black text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all transform active:scale-95`}
                   >
                     <span>Ingresar a {app.nombre}</span>
