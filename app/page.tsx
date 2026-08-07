@@ -5,33 +5,27 @@ export default function Home() {
     {
       id: 'qrifas',
       nombre: 'Qrifas',
-      subdominio: 'qrifas.latinred.app',
+      explicacion: 'App para organizar rifas',
       url: 'https://qrifas.com',
       imagen: '/qrifas-logo.png',
-      badge: '🔴 Tómbola En Vivo',
-      badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
       btnColor: 'from-amber-500 via-rose-500 to-pink-600 hover:from-amber-400 hover:to-rose-500 shadow-rose-950/50',
       icono: Ticket
     },
     {
       id: 'qfutbol',
       nombre: 'Qfutbol',
-      subdominio: 'qfutbol.latinred.app',
+      explicacion: 'App para gestión total de campeonatos',
       url: 'https://qfutbol.latinred.app',
       imagen: '/qfutbol-logo.jpg',
-      badge: '⚽ Campeonatos de Fútbol',
-      badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
       btnColor: 'from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-400 hover:to-teal-500 shadow-emerald-950/50',
       icono: Trophy
     },
     {
       id: 'qcajas',
       nombre: 'Qcajas',
-      subdominio: 'qcajas.latinred.app',
+      explicacion: 'App para gestión de cajas de ahorro y crédito',
       url: 'https://qcajas.latinred.app',
       imagen: null, // Logotipo vectorial estilizado
-      badge: '🏦 Cajas de Ahorro & Crédito',
-      badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
       btnColor: 'from-amber-500 via-yellow-500 to-orange-600 hover:from-amber-400 hover:to-yellow-500 shadow-amber-950/50',
       icono: Landmark
     }
@@ -85,15 +79,15 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* NOMBRE DE LA APP Y BOTÓN DE ACCESO DIRECTO */}
+                {/* NOMBRE DE LA APP, EXPLICACIÓN CORTA Y BOTÓN DE ACCESO DIRECTO */}
                 <div className="w-full space-y-4 pt-6 mt-4 border-t border-slate-850/80">
                   <div>
                     <h2 className="text-3xl font-black text-white uppercase tracking-tight">
                       {app.nombre}
                     </h2>
-                    <span className="text-xs font-mono text-slate-400 font-bold block mt-1">
-                      {app.subdominio}
-                    </span>
+                    <p className="text-xs font-semibold text-slate-300 mt-1">
+                      {app.explicacion}
+                    </p>
                   </div>
 
                   <div className={`w-full bg-gradient-to-r ${app.btnColor} text-white font-black text-sm uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl transition-all group-hover:shadow-2xl`}>
