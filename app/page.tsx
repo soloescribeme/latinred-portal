@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, Trophy, Ticket, Landmark, ShoppingBag, Sparkles, X, Clock } from 'lucide-react';
+import { ArrowRight, Trophy, Ticket, Landmark, ShoppingBag, Truck, Compass, Store, Sparkles, X, Clock } from 'lucide-react';
 
 export default function Home() {
   const [appModal, setAppModal] = useState<{ nombre: string; explicacion: string } | null>(null);
@@ -46,6 +46,36 @@ export default function Home() {
       enDesarrollo: true,
       btnColor: 'from-purple-500 via-indigo-500 to-blue-600 hover:from-purple-400 hover:to-indigo-500 shadow-purple-950/50',
       icono: ShoppingBag
+    },
+    {
+      id: 'kmiones',
+      nombre: 'Kmiones',
+      explicacion: 'Transporte de carga',
+      url: '#',
+      imagen: null, // Logotipo vectorial estilizado
+      enDesarrollo: true,
+      btnColor: 'from-orange-500 via-amber-600 to-red-600 hover:from-orange-400 hover:to-amber-500 shadow-orange-950/50',
+      icono: Truck
+    },
+    {
+      id: 'qaventura',
+      nombre: 'Qaventura',
+      explicacion: 'Rutas, destinos, hospedajes y comidas por viajeros',
+      url: '#',
+      imagen: null, // Logotipo vectorial estilizado
+      enDesarrollo: true,
+      btnColor: 'from-emerald-500 via-teal-600 to-blue-600 hover:from-emerald-400 hover:to-teal-500 shadow-teal-950/50',
+      icono: Compass
+    },
+    {
+      id: 'qtiendas',
+      nombre: 'Qtiendas',
+      explicacion: 'Tiendas recomendadas por usuarios',
+      url: '#',
+      imagen: null, // Logotipo vectorial estilizado
+      enDesarrollo: true,
+      btnColor: 'from-rose-500 via-pink-600 to-purple-600 hover:from-rose-400 hover:to-pink-500 shadow-pink-950/50',
+      icono: Store
     }
   ];
 
