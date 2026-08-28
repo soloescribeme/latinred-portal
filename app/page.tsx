@@ -1,4 +1,4 @@
-import { ArrowRight, Trophy, Ticket, Landmark } from 'lucide-react';
+import { ArrowRight, Trophy, Ticket, Landmark, ShoppingBag } from 'lucide-react';
 
 export default function Home() {
   const apps = [
@@ -28,6 +28,15 @@ export default function Home() {
       imagen: null, // Logotipo vectorial estilizado
       btnColor: 'from-amber-500 via-yellow-500 to-orange-600 hover:from-amber-400 hover:to-yellow-500 shadow-amber-950/50',
       icono: Landmark
+    },
+    {
+      id: 'qvendes',
+      nombre: 'Qvendes',
+      explicacion: 'Sitio de compra y venta',
+      url: 'https://qvendes.latinred.app',
+      imagen: null, // Logotipo vectorial estilizado
+      btnColor: 'from-purple-500 via-indigo-500 to-blue-600 hover:from-purple-400 hover:to-indigo-500 shadow-purple-950/50',
+      icono: ShoppingBag
     }
   ];
 
@@ -49,22 +58,23 @@ export default function Home() {
       </header>
 
       {/* GRID PRINCIPAL DE APLICACIONES DIRECTAS (LOGOS GIGANTES Y CENTRADOS) */}
-      <section className="w-full max-w-6xl my-auto py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 items-stretch">
+      <section className="w-full max-w-7xl my-auto py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-stretch">
           {apps.map((app) => {
+            const IconComponent = app.icono;
             return (
               <a
                 key={app.id}
                 href={app.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-slate-900/60 border border-slate-800 hover:border-slate-600 rounded-3xl p-8 flex flex-col items-center justify-between shadow-2xl hover:shadow-[0_0_40px_rgba(225,29,72,0.15)] transition-all duration-300 group hover:-translate-y-2 relative overflow-hidden backdrop-blur-md text-center"
+                className="bg-slate-900/60 border border-slate-800 hover:border-slate-600 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between shadow-2xl hover:shadow-[0_0_40px_rgba(225,29,72,0.15)] transition-all duration-300 group hover:-translate-y-2 relative overflow-hidden backdrop-blur-md text-center"
               >
                 {/* DECORACIÓN GLOW AL PASAR EL MOUSE */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
                 {/* LOGO GIGANTE Y CENTRADO */}
-                <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl bg-slate-950/80 border border-slate-800 p-4 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 group-hover:border-slate-700 transition-all duration-300 my-auto">
+                <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-3xl bg-slate-950/80 border border-slate-800 p-4 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 group-hover:border-slate-700 transition-all duration-300 my-auto">
                   {app.imagen ? (
                     <img 
                       src={app.imagen} 
@@ -72,9 +82,9 @@ export default function Home() {
                       className="w-full h-full object-contain filter drop-shadow-md"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-transparent rounded-2xl flex flex-col items-center justify-center text-amber-400 p-4">
-                      <Landmark className="w-20 h-20 mb-2 drop-shadow-lg" />
-                      <span className="text-xl font-black uppercase tracking-tighter text-amber-300">QCajas</span>
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent rounded-2xl flex flex-col items-center justify-center text-indigo-400 p-4">
+                      <IconComponent className="w-16 h-16 mb-2 drop-shadow-lg" />
+                      <span className="text-lg font-black uppercase tracking-tighter text-indigo-300">{app.nombre}</span>
                     </div>
                   )}
                 </div>
