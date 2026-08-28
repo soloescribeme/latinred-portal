@@ -42,7 +42,7 @@ export default function Home() {
       nombre: 'Qvendes',
       explicacion: 'Sitio de compra y venta',
       url: '#',
-      imagen: null,
+      imagen: '/qvendes-logo.jpg',
       enDesarrollo: true,
       btnColor: 'from-purple-500 via-indigo-500 to-blue-600',
       icono: ShoppingBag
