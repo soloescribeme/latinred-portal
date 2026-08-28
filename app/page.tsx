@@ -15,7 +15,7 @@ export default function Home() {
       id: 'qfutbol',
       nombre: 'Qfutbol',
       explicacion: 'App para gestión total de campeonatos',
-      url: 'https://qfutbol.latinred.app',
+      url: 'https://qfutbol.vercel.app',
       imagen: '/qfutbol-logo.jpg',
       btnColor: 'from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-400 hover:to-teal-500 shadow-emerald-950/50',
       icono: Trophy
