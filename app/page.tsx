@@ -41,9 +41,9 @@ export default function Home() {
       id: 'qvendes',
       nombre: 'Qvendes',
       explicacion: 'Sitio de compra y venta',
-      url: '#',
+      url: 'https://qvendes.vercel.app',
       imagen: '/qvendes-logo.jpg',
-      enDesarrollo: true,
+      enDesarrollo: false,
       btnColor: 'from-purple-500 via-indigo-500 to-blue-600',
       icono: ShoppingBag
     },
