@@ -90,12 +90,6 @@ async function inicializarTablas() {
         total_visitas INT DEFAULT 1000
       );
     `);
-    
-    // Si la tabla existía con el conteo alto anterior, ajustarla a la base de 1000 solicitada
-    await ejecutarSql(`
-      INSERT INTO latinred_visitas (id, total_visitas) VALUES (1, 1000) 
-      ON CONFLICT (id) DO UPDATE SET total_visitas = 1000 WHERE latinred_visitas.total_visitas > 2000;
-    `);
 
     await ejecutarSql(`
       CREATE TABLE IF NOT EXISTS latinred_visitas_paises (
@@ -106,19 +100,6 @@ async function inicializarTablas() {
         actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-
-    // Resetear países al nuevo conteo base de 1000 si tenían los datos antiguos de 10k
-    const filasPaises = await ejecutarSql(`SELECT SUM(visitas) as suma FROM latinred_visitas_paises;`);
-    const sumaTotal = parseInt(filasPaises?.[0]?.suma || '0', 10);
-    if (sumaTotal === 0 || sumaTotal > 2000) {
-      await ejecutarSql(`DELETE FROM latinred_visitas_paises;`);
-      for (const p of PAISES_INICIALES) {
-        await ejecutarSql(
-          `INSERT INTO latinred_visitas_paises (codigo, nombre, bandera, visitas) VALUES ($1, $2, $3, $4) ON CONFLICT (codigo) DO UPDATE SET visitas = $4;`,
-          [p.codigo, p.nombre, p.bandera, p.visitas]
-        );
-      }
-    }
   } catch (e) {
     console.warn('Inicializacion visitas latinred:', e);
   }
@@ -155,6 +136,21 @@ export async function GET(request: Request) {
     let listaPaises = memoriaPaises;
 
     try {
+      // Si la base de datos tenía el conteo alto anterior (18,000+), resetearlo de inmediato a la base solicitada de 1,000
+      const checkPrev = await ejecutarSql(`SELECT total_visitas FROM latinred_visitas WHERE id = 1;`);
+      const prevTotal = parseInt(checkPrev?.[0]?.total_visitas || '0', 10);
+      if (prevTotal === 0 || prevTotal > 2000) {
+        await ejecutarSql(`INSERT INTO latinred_visitas (id, total_visitas) VALUES (1, 1000) ON CONFLICT (id) DO UPDATE SET total_visitas = 1000;`);
+        await ejecutarSql(`DELETE FROM latinred_visitas_paises;`);
+        for (const p of PAISES_INICIALES) {
+          await ejecutarSql(
+            `INSERT INTO latinred_visitas_paises (codigo, nombre, bandera, visitas) VALUES ($1, $2, $3, $4) ON CONFLICT (codigo) DO UPDATE SET visitas = $4;`,
+            [p.codigo, p.nombre, p.bandera, p.visitas]
+          );
+        }
+      }
+
+      // Incrementar visita real
       const resTotal = await ejecutarSql(`
         UPDATE latinred_visitas SET total_visitas = total_visitas + 1 WHERE id = 1 RETURNING total_visitas;
       `);
