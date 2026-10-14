@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 function obtenerBandera(codigoPais: string): string {
   if (!codigoPais || codigoPais.length !== 2 || codigoPais === 'OT' || codigoPais === 'XX') {
     return '🌐';
@@ -238,11 +240,9 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     console.error('Error en API visitas latinred:', error);
-    const msg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
         success: true,
-        error_debug: msg,
         total_visitas: memoriaVisitasTotal,
         pais_actual: { codigo: 'EC', nombre: 'Ecuador', bandera: '🇪🇨' },
         paises: memoriaPaises.map((p) => ({ ...p, porcentaje: 10 })),
