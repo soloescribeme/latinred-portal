@@ -32,6 +32,30 @@ function flagFromCode(code: string): string {
   }
 }
 
+const NOMBRES_PAISES_MAP: Record<string, string> = {
+  EC: 'Ecuador',
+  CO: 'Colombia',
+  PE: 'Perú',
+  US: 'Estados Unidos',
+  ES: 'España',
+  MX: 'México',
+  AR: 'Argentina',
+  CL: 'Chile',
+  BO: 'Bolivia',
+  VE: 'Venezuela',
+  BR: 'Brasil',
+  PA: 'Panamá',
+  UY: 'Uruguay',
+  PY: 'Paraguay',
+  CR: 'Costa Rica',
+  DO: 'Rep. Dominicana',
+  GT: 'Guatemala',
+  IT: 'Italia',
+  CA: 'Canadá',
+  DE: 'Alemania',
+  FR: 'Francia',
+};
+
 export default function Home() {
   const [appModal, setAppModal] = useState<{ nombre: string; explicacion: string } | null>(null);
 
@@ -166,12 +190,14 @@ export default function Home() {
     { codigo: 'AR', nombre: 'Argentina', visitas: 20 },
   ];
 
-  const textoMarquesina = listaPaisesMarquesina
-    .map((p) => {
-      const flag = p.bandera || flagFromCode(p.codigo);
-      return `${flag} ${p.nombre}: ${p.visitas.toLocaleString()}`;
-    })
-    .join('     •     ');
+  const itemsMarquesina = listaPaisesMarquesina.map((p) => {
+    const flag = flagFromCode(p.codigo);
+    const name = NOMBRES_PAISES_MAP[p.codigo] || p.nombre;
+    return `${flag} ${name}: ${p.visitas.toLocaleString()}`;
+  });
+
+  const bloqueTexto = itemsMarquesina.join('     •     ');
+  const textoMarquesina = `${bloqueTexto}     •     ${bloqueTexto}`;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between items-center relative overflow-hidden font-sans selection:bg-rose-500 selection:text-white p-4 sm:p-6 lg:p-8">
