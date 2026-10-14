@@ -76,7 +76,7 @@ async function ejecutarSql(query: string, params: any[] = []) {
       return null;
     }
     const data = await res.json();
-    return data.rows || [];
+    return Array.isArray(data) ? data : (data.rows || []);
   } catch (err) {
     console.warn('Error al conectar con Neon DB:', err);
     return null;
@@ -123,8 +123,13 @@ let tablasInicializadas = false;
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const countryParam = (searchParams.get('country') || '').toUpperCase().trim();
+    let countryParam = '';
+    try {
+      const url = new URL(request.url, 'https://latinred.app');
+      countryParam = (url.searchParams.get('country') || '').toUpperCase().trim();
+    } catch (e) {
+      // Ignorar fallo de parseo
+    }
 
     // Detección de país por headers o parámetro
     const headerCountry = (
@@ -184,6 +189,10 @@ export async function GET(request: Request) {
       }
     } catch (dbErr) {
       console.warn('Fallo al persistir visita en DB, usando memoria:', dbErr);
+    }
+
+    // Si la DB falló o está fría, incrementar en memoria
+    if (listaPaises === memoriaPaises) {
       memoriaVisitasTotal += 1;
       totalVisitas = memoriaVisitasTotal;
       const index = memoriaPaises.findIndex((p) => p.codigo === codigoPais);
@@ -229,9 +238,11 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     console.error('Error en API visitas latinred:', error);
+    const msg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
-        success: false,
+        success: true,
+        error_debug: msg,
         total_visitas: memoriaVisitasTotal,
         pais_actual: { codigo: 'EC', nombre: 'Ecuador', bandera: '🇪🇨' },
         paises: memoriaPaises.map((p) => ({ ...p, porcentaje: 10 })),

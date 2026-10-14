@@ -57,7 +57,7 @@ export default function Home() {
         const res = await fetch(url, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (montado && data.success) {
+          if (montado && (data.total_visitas !== undefined || data.success)) {
             setVisitasTotal(data.total_visitas);
             setPaisesVisitas(data.paises || []);
             if (data.pais_actual) {
