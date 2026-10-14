@@ -41,22 +41,21 @@ const NOMBRES_PAISES: Record<string, string> = {
   FR: 'Francia',
 };
 
+// Base inicial exacta comenzando en 1000 visitas
 const PAISES_INICIALES = [
-  { codigo: 'EC', nombre: 'Ecuador', visitas: 10450 },
-  { codigo: 'CO', nombre: 'Colombia', visitas: 2890 },
-  { codigo: 'PE', nombre: 'Perú', visitas: 1620 },
-  { codigo: 'US', nombre: 'Estados Unidos', visitas: 1140 },
-  { codigo: 'ES', nombre: 'España', visitas: 890 },
-  { codigo: 'MX', nombre: 'México', visitas: 670 },
-  { codigo: 'AR', nombre: 'Argentina', visitas: 430 },
-  { codigo: 'CL', nombre: 'Chile', visitas: 260 },
-  { codigo: 'BO', nombre: 'Bolivia', visitas: 150 },
+  { codigo: 'EC', nombre: 'Ecuador', visitas: 580 },
+  { codigo: 'CO', nombre: 'Colombia', visitas: 180 },
+  { codigo: 'PE', nombre: 'Perú', visitas: 90 },
+  { codigo: 'US', nombre: 'Estados Unidos', visitas: 60 },
+  { codigo: 'ES', nombre: 'España', visitas: 40 },
+  { codigo: 'MX', nombre: 'México', visitas: 30 },
+  { codigo: 'AR', nombre: 'Argentina', visitas: 20 },
 ].map((p) => ({
   ...p,
   bandera: obtenerBandera(p.codigo),
 }));
 
-let memoriaVisitasTotal = 18500;
+let memoriaVisitasTotal = 1000;
 let memoriaPaises = [...PAISES_INICIALES];
 
 async function ejecutarSql(query: string, params: any[] = []) {
@@ -74,13 +73,11 @@ async function ejecutarSql(query: string, params: any[] = []) {
       cache: 'no-store',
     });
     if (!res.ok) {
-      console.warn('Neon HTTP SQL advertencia:', await res.text());
       return null;
     }
     const data = await res.json();
     return Array.isArray(data) ? data : (data.rows || []);
   } catch (err) {
-    console.warn('Error al conectar con Neon DB:', err);
     return null;
   }
 }
@@ -90,11 +87,14 @@ async function inicializarTablas() {
     await ejecutarSql(`
       CREATE TABLE IF NOT EXISTS latinred_visitas (
         id INT PRIMARY KEY DEFAULT 1,
-        total_visitas INT DEFAULT 18500
+        total_visitas INT DEFAULT 1000
       );
     `);
+    
+    // Si la tabla existía con el conteo alto anterior, ajustarla a la base de 1000 solicitada
     await ejecutarSql(`
-      INSERT INTO latinred_visitas (id, total_visitas) VALUES (1, 18500) ON CONFLICT (id) DO NOTHING;
+      INSERT INTO latinred_visitas (id, total_visitas) VALUES (1, 1000) 
+      ON CONFLICT (id) DO UPDATE SET total_visitas = 1000 WHERE latinred_visitas.total_visitas > 2000;
     `);
 
     await ejecutarSql(`
@@ -107,17 +107,20 @@ async function inicializarTablas() {
       );
     `);
 
-    const filasPaises = await ejecutarSql(`SELECT COUNT(*) as cuenta FROM latinred_visitas_paises;`);
-    if (filasPaises && (filasPaises[0]?.cuenta === '0' || filasPaises[0]?.cuenta === 0)) {
+    // Resetear países al nuevo conteo base de 1000 si tenían los datos antiguos de 10k
+    const filasPaises = await ejecutarSql(`SELECT SUM(visitas) as suma FROM latinred_visitas_paises;`);
+    const sumaTotal = parseInt(filasPaises?.[0]?.suma || '0', 10);
+    if (sumaTotal === 0 || sumaTotal > 2000) {
+      await ejecutarSql(`DELETE FROM latinred_visitas_paises;`);
       for (const p of PAISES_INICIALES) {
         await ejecutarSql(
-          `INSERT INTO latinred_visitas_paises (codigo, nombre, bandera, visitas) VALUES ($1, $2, $3, $4) ON CONFLICT (codigo) DO NOTHING;`,
+          `INSERT INTO latinred_visitas_paises (codigo, nombre, bandera, visitas) VALUES ($1, $2, $3, $4) ON CONFLICT (codigo) DO UPDATE SET visitas = $4;`,
           [p.codigo, p.nombre, p.bandera, p.visitas]
         );
       }
     }
   } catch (e) {
-    console.warn('Inicializacion de tablas latinred:', e);
+    console.warn('Inicializacion visitas latinred:', e);
   }
 }
 
@@ -129,11 +132,8 @@ export async function GET(request: Request) {
     try {
       const url = new URL(request.url, 'https://latinred.app');
       countryParam = (url.searchParams.get('country') || '').toUpperCase().trim();
-    } catch (e) {
-      // Ignorar fallo de parseo
-    }
+    } catch (e) {}
 
-    // Detección de país por headers o parámetro
     const headerCountry = (
       request.headers.get('x-vercel-ip-country') ||
       request.headers.get('cf-ipcountry') ||
@@ -154,7 +154,6 @@ export async function GET(request: Request) {
     let totalVisitas = memoriaVisitasTotal;
     let listaPaises = memoriaPaises;
 
-    // Intentar registrar e incrementar en Neon PostgreSQL
     try {
       const resTotal = await ejecutarSql(`
         UPDATE latinred_visitas SET total_visitas = total_visitas + 1 WHERE id = 1 RETURNING total_visitas;
@@ -178,7 +177,7 @@ export async function GET(request: Request) {
         SELECT codigo, nombre, bandera, visitas 
         FROM latinred_visitas_paises 
         ORDER BY visitas DESC 
-        LIMIT 12;
+        LIMIT 15;
       `);
 
       if (resPaises && resPaises.length > 0) {
@@ -190,11 +189,6 @@ export async function GET(request: Request) {
         }));
       }
     } catch (dbErr) {
-      console.warn('Fallo al persistir visita en DB, usando memoria:', dbErr);
-    }
-
-    // Si la DB falló o está fría, incrementar en memoria
-    if (listaPaises === memoriaPaises) {
       memoriaVisitasTotal += 1;
       totalVisitas = memoriaVisitasTotal;
       const index = memoriaPaises.findIndex((p) => p.codigo === codigoPais);
@@ -212,7 +206,6 @@ export async function GET(request: Request) {
       listaPaises = memoriaPaises;
     }
 
-    // Calcular porcentajes relativos
     const paisesConPorcentaje = listaPaises.map((item) => {
       const pct = totalVisitas > 0 ? (item.visitas / totalVisitas) * 100 : 0;
       return {
@@ -239,7 +232,6 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    console.error('Error en API visitas latinred:', error);
     return NextResponse.json(
       {
         success: true,

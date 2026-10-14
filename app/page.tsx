@@ -11,12 +11,7 @@ import {
   Compass, 
   Store, 
   X, 
-  Clock, 
-  Globe, 
-  Eye, 
-  Users, 
-  Activity, 
-  Sparkles 
+  Clock 
 } from 'lucide-react';
 
 interface PaisStat {
@@ -30,10 +25,9 @@ interface PaisStat {
 export default function Home() {
   const [appModal, setAppModal] = useState<{ nombre: string; explicacion: string } | null>(null);
 
-  // Estados del Contador de Visitas Globales y por Países
+  // Estados del Contador
   const [visitasTotal, setVisitasTotal] = useState<number | null>(null);
   const [paisesVisitas, setPaisesVisitas] = useState<PaisStat[]>([]);
-  const [paisDetectado, setPaisDetectado] = useState<{ codigo: string; nombre: string; bandera: string } | null>(null);
   const [cargandoVisitas, setCargandoVisitas] = useState<boolean>(true);
 
   useEffect(() => {
@@ -60,13 +54,10 @@ export default function Home() {
           if (montado && (data.total_visitas !== undefined || data.success)) {
             setVisitasTotal(data.total_visitas);
             setPaisesVisitas(data.paises || []);
-            if (data.pais_actual) {
-              setPaisDetectado(data.pais_actual);
-            }
           }
         }
       } catch (err) {
-        console.warn('Error al consultar contador de visitas:', err);
+        console.warn('Error al consultar visitas:', err);
       } finally {
         if (montado) setCargandoVisitas(false);
       }
@@ -151,9 +142,21 @@ export default function Home() {
     }
   ];
 
-  // CÁLCULO TRIGONOMÉTRICO PARA DISPOSICIÓN CIRCULAR EN ESCRITORIO
   const totalApps = apps.length;
   const radiusDesktop = 340;
+
+  // Texto para la marquesina con los países que han visitado
+  const textoMarquesina = (paisesVisitas.length > 0 ? paisesVisitas : [
+    { bandera: '🇪🇨', nombre: 'Ecuador', visitas: 580 },
+    { bandera: '🇨🇴', nombre: 'Colombia', visitas: 180 },
+    { bandera: '🇵🇪', nombre: 'Perú', visitas: 90 },
+    { bandera: '🇺🇸', nombre: 'Estados Unidos', visitas: 60 },
+    { bandera: '🇪🇸', nombre: 'España', visitas: 40 },
+    { bandera: '🇲🇽', nombre: 'México', visitas: 30 },
+    { bandera: '🇦🇷', nombre: 'Argentina', visitas: 20 },
+  ])
+    .map((p) => `${p.bandera} ${p.nombre}: ${p.visitas.toLocaleString()}`)
+    .join('     •     ');
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 selection:bg-rose-500 selection:text-white flex flex-col justify-between items-center relative overflow-hidden py-6 px-4">
@@ -338,134 +341,35 @@ export default function Home() {
         </div>
       </div>
 
-      {/* FOOTER PREMIUM CON CONTADOR DE VISITAS TOTALES Y POR PAÍSES */}
-      <footer className="w-full max-w-5xl mx-auto pt-10 pb-6 px-2 sm:px-4 z-10">
-        <div className="bg-gradient-to-b from-slate-900/90 to-slate-950/95 border border-slate-800/80 hover:border-slate-700/80 rounded-3xl p-5 sm:p-7 shadow-[0_0_50px_rgba(0,0,0,0.6)] backdrop-blur-xl relative overflow-hidden transition-all duration-300">
-          
-          {/* Resplandor ambiental de fondo */}
-          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-28 bg-rose-500/10 blur-3xl pointer-events-none rounded-full" />
+      {/* FOOTER SENCILLO E INFORMATIVO */}
+      <footer className="w-full max-w-6xl mx-auto pt-6 pb-4 px-4 z-10 text-xs">
+        
+        {/* Fila: Derechos a la izquierda • Visitas totales en texto plano a la derecha */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-800/80 pt-3">
+          <p className="text-slate-500 text-[11px] font-medium text-center sm:text-left">
+            © {new Date().getFullYear()} LatinRed Apps Ecosystem. Todos los derechos reservados.
+          </p>
 
-          {/* Cabecera del Contador */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
-            
-            {/* Título & Estado En Vivo */}
-            <div className="flex items-center gap-3.5 text-center sm:text-left">
-              <div className="w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400 shadow-inner shrink-0">
-                <Globe className="w-6 h-6 animate-[spin_30s_linear_infinite]" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                    Monitor de Visitantes Globales
-                  </h3>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-black text-emerald-400 uppercase tracking-wider">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    En Vivo
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                  Conteo de tráfico en tiempo real en la red oficial de LatinRed
-                </p>
-              </div>
-            </div>
-
-            {/* Caja de Visitas Totales */}
-            <div className="flex items-center gap-3.5 bg-slate-950/90 border border-slate-800/90 px-5 py-3 rounded-2xl shadow-inner">
-              <div className="text-right">
-                <span className="text-[10px] uppercase font-black tracking-widest text-slate-400 block">
-                  Visitas Totales
-                </span>
-                <div className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 tracking-tight font-mono">
-                  {cargandoVisitas && visitasTotal === null ? (
-                    <span className="animate-pulse text-slate-500">...</span>
-                  ) : (
-                    (visitasTotal || 0).toLocaleString()
-                  )}
-                </div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500/20 to-amber-500/20 border border-rose-500/30 flex items-center justify-center text-amber-300 shrink-0">
-                <Eye className="w-5 h-5" />
-              </div>
-            </div>
-
+          {/* Esquina derecha: Visitas totales en texto plano */}
+          <div className="text-slate-300 text-xs flex items-center gap-1.5 self-center sm:self-auto font-medium">
+            <span className="text-slate-400">Visitas totales:</span>
+            <strong className="text-white font-mono font-bold tracking-tight">
+              {cargandoVisitas && visitasTotal === null ? '1,000' : (visitasTotal || 1000).toLocaleString()}
+            </strong>
           </div>
-
-          {/* Detección de País del Visitante Actual */}
-          {paisDetectado && (
-            <div className="mt-4 flex flex-wrap items-center justify-center sm:justify-between gap-2 text-xs text-slate-400 bg-slate-950/70 border border-slate-800/80 rounded-2xl px-4 py-2.5 shadow-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-xl filter drop-shadow">{paisDetectado.bandera}</span>
-                <span>
-                  Estás navegando desde: <strong className="text-slate-100 font-bold">{paisDetectado.nombre}</strong>
-                </span>
-              </div>
-              <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                Tu visita ha sido contabilizada
-              </span>
-            </div>
-          )}
-
-          {/* Distribución por Países */}
-          <div className="mt-6 space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
-              <span className="flex items-center gap-1.5 uppercase text-[11px] tracking-wider text-slate-300">
-                <Users className="w-3.5 h-3.5 text-rose-400" />
-                Distribución por Países
-              </span>
-              <span className="text-[11px] text-slate-400 font-medium">
-                {paisesVisitas.length > 0 ? `${paisesVisitas.length} países activos` : 'Conectando...'}
-              </span>
-            </div>
-
-            {/* Grid de Banderas y Visitas */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2.5">
-              {paisesVisitas.map((item) => (
-                <div 
-                  key={item.codigo}
-                  className="group bg-slate-950/70 hover:bg-slate-900/90 border border-slate-800/80 hover:border-rose-500/50 p-3 rounded-2xl transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-[0_0_20px_rgba(225,29,72,0.15)] hover:scale-[1.02]"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-xl leading-none filter drop-shadow">{item.bandera}</span>
-                      <span className="text-xs font-bold text-slate-200 truncate group-hover:text-white transition-colors">
-                        {item.nombre}
-                      </span>
-                    </div>
-                    <span className="text-xs font-mono font-black text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg border border-rose-500/20 shrink-0">
-                      {item.visitas.toLocaleString()}
-                    </span>
-                  </div>
-
-                  {/* Micro Barra de Progreso de Porcentaje */}
-                  <div className="mt-2.5 w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-rose-500 to-amber-400 h-full rounded-full transition-all duration-700"
-                      style={{ width: `${Math.max(item.porcentaje, 4)}%` }}
-                    />
-                  </div>
-                  <div className="mt-1 flex justify-between text-[9px] text-slate-400">
-                    <span>{item.porcentaje}% del tráfico</span>
-                    <span className="uppercase text-[8px] font-bold text-slate-400">{item.codigo}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Línea Inferior y Copyright */}
-          <div className="mt-7 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
-            <p>© {new Date().getFullYear()} LatinRed Apps Ecosystem. Todos los derechos reservados.</p>
-            <div className="flex flex-wrap items-center justify-center gap-3 text-slate-400">
-              <span className="hover:text-slate-200 transition-colors">qvendes.latinred.app</span>
-              <span>•</span>
-              <span className="hover:text-slate-200 transition-colors">qrifas.latinred.app</span>
-              <span>•</span>
-              <span className="hover:text-slate-200 transition-colors">qfutbol.latinred.app</span>
-            </div>
-          </div>
-
         </div>
+
+        {/* Debajo en una sola línea: Marquesina con países que han visitado */}
+        <div className="w-full mt-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl px-3 py-1.5 overflow-hidden flex items-center gap-2">
+          <span className="text-[10px] uppercase font-bold text-rose-400 whitespace-nowrap hidden sm:inline-block">
+            Países visitantes:
+          </span>
+          {/* @ts-ignore */}
+          <marquee className="text-xs text-slate-300 font-medium tracking-wide" scrollamount="4">
+            {textoMarquesina}
+          </marquee>
+        </div>
+
       </footer>
 
     </main>
