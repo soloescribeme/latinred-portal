@@ -136,21 +136,7 @@ export async function GET(request: Request) {
     let listaPaises = memoriaPaises;
 
     try {
-      // Si la base de datos tenía el conteo alto anterior (18,000+), resetearlo de inmediato a la base solicitada de 1,000
-      const checkPrev = await ejecutarSql(`SELECT total_visitas FROM latinred_visitas WHERE id = 1;`);
-      const prevTotal = parseInt(checkPrev?.[0]?.total_visitas || '0', 10);
-      if (prevTotal === 0 || prevTotal > 2000) {
-        await ejecutarSql(`INSERT INTO latinred_visitas (id, total_visitas) VALUES (1, 1000) ON CONFLICT (id) DO UPDATE SET total_visitas = 1000;`);
-        await ejecutarSql(`DELETE FROM latinred_visitas_paises;`);
-        for (const p of PAISES_INICIALES) {
-          await ejecutarSql(
-            `INSERT INTO latinred_visitas_paises (codigo, nombre, bandera, visitas) VALUES ($1, $2, $3, $4) ON CONFLICT (codigo) DO UPDATE SET visitas = $4;`,
-            [p.codigo, p.nombre, p.bandera, p.visitas]
-          );
-        }
-      }
-
-      // Incrementar visita real
+      // Incrementar visita total en base de datos
       const resTotal = await ejecutarSql(`
         UPDATE latinred_visitas SET total_visitas = total_visitas + 1 WHERE id = 1 RETURNING total_visitas;
       `);
@@ -179,8 +165,8 @@ export async function GET(request: Request) {
       if (resPaises && resPaises.length > 0) {
         listaPaises = resPaises.map((r: any) => ({
           codigo: r.codigo,
-          nombre: r.nombre,
-          bandera: r.bandera || obtenerBandera(r.codigo),
+          nombre: NOMBRES_PAISES[r.codigo] || r.nombre,
+          bandera: obtenerBandera(r.codigo),
           visitas: parseInt(r.visitas, 10),
         }));
       }

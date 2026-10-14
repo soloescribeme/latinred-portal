@@ -22,6 +22,16 @@ interface PaisStat {
   porcentaje: number;
 }
 
+function flagFromCode(code: string): string {
+  if (!code || code.length !== 2) return '🌐';
+  try {
+    const codePoints = code.toUpperCase().split('').map((c) => 127397 + c.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  } catch (e) {
+    return '🌐';
+  }
+}
+
 export default function Home() {
   const [appModal, setAppModal] = useState<{ nombre: string; explicacion: string } | null>(null);
 
@@ -145,57 +155,52 @@ export default function Home() {
   const totalApps = apps.length;
   const radiusDesktop = 340;
 
-  // Texto para la marquesina con los países que han visitado
-  const textoMarquesina = (paisesVisitas.length > 0 ? paisesVisitas : [
-    { bandera: '🇪🇨', nombre: 'Ecuador', visitas: 580 },
-    { bandera: '🇨🇴', nombre: 'Colombia', visitas: 180 },
-    { bandera: '🇵🇪', nombre: 'Perú', visitas: 90 },
-    { bandera: '🇺🇸', nombre: 'Estados Unidos', visitas: 60 },
-    { bandera: '🇪🇸', nombre: 'España', visitas: 40 },
-    { bandera: '🇲🇽', nombre: 'México', visitas: 30 },
-    { bandera: '🇦🇷', nombre: 'Argentina', visitas: 20 },
-  ])
-    .map((p) => `${p.bandera} ${p.nombre}: ${p.visitas.toLocaleString()}`)
+  // Lista de países para la marquesina
+  const listaPaisesMarquesina = paisesVisitas.length > 0 ? paisesVisitas : [
+    { codigo: 'EC', nombre: 'Ecuador', visitas: 580 },
+    { codigo: 'CO', nombre: 'Colombia', visitas: 180 },
+    { codigo: 'PE', nombre: 'Perú', visitas: 90 },
+    { codigo: 'US', nombre: 'Estados Unidos', visitas: 60 },
+    { codigo: 'ES', nombre: 'España', visitas: 40 },
+    { codigo: 'MX', nombre: 'México', visitas: 30 },
+    { codigo: 'AR', nombre: 'Argentina', visitas: 20 },
+  ];
+
+  const textoMarquesina = listaPaisesMarquesina
+    .map((p) => {
+      const flag = p.bandera || flagFromCode(p.codigo);
+      return `${flag} ${p.nombre}: ${p.visitas.toLocaleString()}`;
+    })
     .join('     •     ');
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 selection:bg-rose-500 selection:text-white flex flex-col justify-between items-center relative overflow-hidden py-6 px-4">
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between items-center relative overflow-hidden font-sans selection:bg-rose-500 selection:text-white p-4 sm:p-6 lg:p-8">
       
-      {/* LUCES Y GLOW DE FONDO AMBIENTAL */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-gradient-to-tr from-rose-600/20 via-amber-500/15 to-indigo-600/20 blur-[150px] rounded-full pointer-events-none -z-10" />
-
-      {/* MODAL DE AVISO PRÓXIMAMENTE */}
+      {/* MODAL PARA APPS EN DESARROLLO */}
       {appModal && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full text-center space-y-6 shadow-2xl animate-in fade-in zoom-in duration-200 relative">
-            <button 
-              type="button" 
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative">
+            <button
               onClick={() => setAppModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/50 border border-slate-700"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
-
-            <div className="w-20 h-20 bg-amber-500/10 border border-amber-500/30 rounded-3xl flex items-center justify-center text-amber-400 mx-auto shadow-lg">
-              <Clock className="w-10 h-10 animate-pulse" />
+            <div className="w-16 h-16 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Clock className="w-8 h-8 animate-pulse" />
             </div>
-
-            <div className="space-y-2">
-              <span className="bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-amber-500/30">
-                ★ Próximamente en Lanzamiento
-              </span>
-              <h3 className="text-3xl font-black text-white uppercase">{appModal.nombre}</h3>
-              <p className="text-xs text-slate-300 font-semibold">{appModal.explicacion}</p>
-            </div>
-
-            <p className="text-xs text-slate-400 bg-slate-950 p-4 rounded-2xl border border-slate-850">
-              Estamos preparando la versión oficial de <strong className="text-white">{appModal.nombre}</strong> para integrarla a nuestro ecosistema LatinRed. ¡Muy pronto estará disponible!
+            <h3 className="text-xl font-black text-white uppercase tracking-wider mb-2">
+              {appModal.nombre}
+            </h3>
+            <p className="text-sm font-semibold text-rose-400 mb-3">
+              {appModal.explicacion}
             </p>
-
+            <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-300">
+              Estamos trabajando intensamente en el lanzamiento de esta aplicación. ¡Muy pronto estará disponible en el ecosistema LatinRed!
+            </div>
             <button
-              type="button"
               onClick={() => setAppModal(null)}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase py-3.5 rounded-xl border border-slate-700 transition-all"
+              className="mt-5 w-full py-2.5 rounded-xl font-bold text-xs uppercase bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md"
             >
               Entendido
             </button>
@@ -203,11 +208,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* CONTENEDOR CIRCULAR ORBITAL (DESKTOP) */}
-      <div className="my-auto relative w-full max-w-6xl h-[820px] hidden lg:flex items-center justify-center">
-        
-        {/* LÍNEA DE ÓRBITA CIRCULAR DECORATIVA */}
-        <div className="absolute w-[680px] h-[680px] rounded-full border border-dashed border-rose-500/20 animate-[spin_120s_linear_infinite] pointer-events-none" />
+      {/* EFECTOS DE FONDO */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-600/10 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-600/10 blur-[130px] rounded-full pointer-events-none -z-10" />
+
+      {/* VERSIÓN ESCRITORIO (ÓRBITA 360) */}
+      <div className="hidden lg:flex relative w-[760px] h-[760px] my-auto items-center justify-center">
+        {/* LÍNEAS DE ÓRBITA */}
+        <div className="absolute w-[680px] h-[680px] rounded-full border border-dashed border-slate-800/80 pointer-events-none" />
         <div className="absolute w-[685px] h-[685px] rounded-full border border-slate-800/60 pointer-events-none" />
 
         {/* LOGO DE LATINRED CENTRADO */}
@@ -353,13 +361,13 @@ export default function Home() {
           {/* Esquina derecha: Visitas totales en texto plano */}
           <div className="text-slate-300 text-xs flex items-center gap-1.5 self-center sm:self-auto font-medium">
             <span className="text-slate-400">Visitas totales:</span>
-            <strong className="text-white font-mono font-bold tracking-tight">
+            <span className="text-white font-mono font-bold tracking-tight">
               {cargandoVisitas && visitasTotal === null ? '1,000' : (visitasTotal || 1000).toLocaleString()}
-            </strong>
+            </span>
           </div>
         </div>
 
-        {/* Debajo en una sola línea: Marquesina con países que han visitado */}
+        {/* Debajo en una sola línea: Marquesina que corra un texto con los países que nos han visitado */}
         <div className="w-full mt-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl px-3 py-1.5 overflow-hidden flex items-center gap-2">
           <span className="text-[10px] uppercase font-bold text-rose-400 whitespace-nowrap hidden sm:inline-block">
             Países visitantes:
