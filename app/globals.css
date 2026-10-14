@@ -32,3 +32,23 @@ body {
 .glow-box {
   animation: pulseGlow 4s infinite ease-in-out;
 }
+
+@keyframes tickerMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-ticker {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: tickerMarquee 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}

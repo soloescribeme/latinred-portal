@@ -197,7 +197,6 @@ export default function Home() {
   });
 
   const bloqueTexto = itemsMarquesina.join('     •     ');
-  const textoMarquesina = `${bloqueTexto}     •     ${bloqueTexto}`;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between items-center relative overflow-hidden font-sans selection:bg-rose-500 selection:text-white p-4 sm:p-6 lg:p-8">
@@ -393,15 +392,17 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Debajo en una sola línea: Marquesina que corra un texto con los países que nos han visitado */}
-        <div className="w-full mt-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl px-3 py-1.5 overflow-hidden flex items-center gap-2">
-          <span className="text-[10px] uppercase font-bold text-rose-400 whitespace-nowrap hidden sm:inline-block">
+        {/* Debajo en una sola línea: Marquesina con países que han visitado */}
+        <div className="w-full mt-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl px-3 py-2 overflow-hidden flex items-center gap-2 sm:gap-3">
+          <span className="text-[10px] uppercase font-bold text-rose-400 whitespace-nowrap shrink-0 hidden sm:inline-block">
             Países visitantes:
           </span>
-          {/* @ts-ignore */}
-          <marquee className="text-xs text-slate-300 font-medium tracking-wide" scrollamount="4">
-            {textoMarquesina}
-          </marquee>
+          <div className="overflow-hidden whitespace-nowrap flex-1 w-full">
+            <div className="animate-ticker text-xs text-slate-300 font-medium tracking-wide">
+              <span className="pr-12">{bloqueTexto}</span>
+              <span className="pr-12">{bloqueTexto}</span>
+            </div>
+          </div>
         </div>
 
       </footer>
